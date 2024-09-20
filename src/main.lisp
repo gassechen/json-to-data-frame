@@ -1,10 +1,9 @@
-(in-package :cl-user)
-(defpackage :data-frame-json
-  (:use :cl )
-  (:export :make-dataframe))
-  
-  
-(in-package :data-frame-json)
+(defpackage json-to-df
+  (:use :cl)
+  (:export #:json-to-df
+	   #:dump-db))
+
+(in-package :json-to-df)
 
 (defvar *db* nil)
 (defvar *data* nil)
@@ -184,7 +183,8 @@
   (yason:parse (make-string-input-stream json-string)))
 
 
-(defun make-dataframe (data)
+
+(defun json-to-df (data &optional (df-name "DF"))
   ;; Ensure session is not NIL
   ;; Verify and set the structure of the data
   (setf *data* (check-structure-type data))
@@ -199,13 +199,13 @@
         (process-hash-table-list hash-table-list)))
 
     ;; Define the dataframe using lisp-stat:defdf
-    
-    (lisp-stat:defdf df
-        (make-data-frame (extract-keys-columns *db*) *db*))
+    (eval  `(lisp-stat:defdf ,(intern (str:upcase df-name))
+		,(make-data-frame (extract-keys-columns *db*) *db*)))))
 
 
-    ;; Apply heuristic type inference to the dataframe
-    (lisp-stat:heuristicate-types df)))
+  ;; Apply heuristic type inference to the dataframe
+  ;;(eval `(lisp-stat:heuristicate-types ,(get-session-data *session* 'myproject::df-name)))))
+
 
 
 
@@ -227,18 +227,4 @@
 
 
 
-(defparameter *url* "https://jsonplaceholder.typicode.com/posts")
-
-
-(defun call-api (url-get)
-  (let* ((yason:*parse-json-booleans-as-symbols* t)
-         (yason:*parse-json-arrays-as-vectors* nil)
-         (respuesta
-           (yason:parse
-            (dex:get url-get
-                     :keep-alive t
-                     :use-connection-pool t
-                     :connect-timeout 60
-                     :want-stream t))))
-    respuesta))
 
