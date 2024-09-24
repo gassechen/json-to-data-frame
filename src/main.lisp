@@ -1,6 +1,7 @@
 (defpackage json-to-df
   (:use :cl)
   (:export #:json-to-df
+	   #:get-from-url
 	   #:dump-db))
 
 (in-package :json-to-df)
@@ -164,12 +165,16 @@
 
 
 (defun check-structure-type (data)
-  (cond ((consp data)
+  (cond ((consp data)  
          (make-data-structure-correct data))
-        ((every #'characterp data)
-	  (make-data-structure-correct (parse-json-string data)))
-        (t
+        ((and (stringp data)  
+              (every #'characterp data))  
+         (make-data-structure-correct (parse-json-string data)))
+        ((hash-table-p data)  
+         (h-table data))
+        (t  
          data)))
+
 
 
   (defun make-data-structure-correct(data)
@@ -183,6 +188,12 @@
   (yason:parse (make-string-input-stream json-string)))
 
 
+(defun h-table (data)
+  (when (> (hash-table-count data) 1)
+    (let ((entries (extract-entries data)))
+      (car (evaluate-entries entries)))))
+
+  
 
 (defun json-to-df (data &optional (df-name "DF"))
   ;; Ensure session is not NIL
@@ -214,6 +225,25 @@
   (lisp-stat:make-df (reverse (lisp-stat:keys df)) (reverse (lisp-stat:columns df))))
 
 
+(defun extract-entries (hash-table)
+  (let ((entries '()))
+    (maphash (lambda (key value)
+               (push (cons key value) entries))
+             hash-table)
+    entries))
+
+
+(defun evaluate-entries (entries)
+  (let ((response '()))
+    (dolist (entry entries)
+      (let ((key (car entry))
+            (value (cdr entry)))
+        (when (listp value)
+          (push value response))))
+    response))
+
+
+
 (defun remove-accents (str)
   (let* ((trans (make-hash-table :test 'equal))
          (chars (coerce a 'list))
@@ -224,6 +254,33 @@
     (coerce (loop for char across str
                   collect (gethash char trans char)) 
             'string)))
+
+
+(defun call-api (url-get)
+  (let* ((yason:*parse-json-booleans-as-symbols* t)
+         (yason:*parse-json-arrays-as-vectors* nil)
+         (respuesta
+           (yason:parse
+            (dex:get url-get
+                     :keep-alive t
+                     :use-connection-pool t
+                     :connect-timeout 60
+                     :want-stream t))))
+    respuesta))
+
+(defun get-from-url (url-get &optional (df-name "DF") (key nil))
+  "Obtiene los datos desde la URL y, si `key` no es nil, busca el valor asociado con esa clave.
+   Si `key` es nil, pasa directamente la respuesta JSON completa a `json-to-df`."
+  (let ((response (call-api url-get)))
+    (if key
+        (json-to-df (gethash key response) df-name)
+        (json-to-df response df-name))))
+
+
+
+
+
+
 
 
 

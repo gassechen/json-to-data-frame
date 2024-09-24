@@ -1,46 +1,73 @@
-(defpackage :json-to-df/tests/main
-  (:use :cl :json-to-df :yason :rove :lisp-stat :data-frame))
+(uiop:define-package #:json-to-df-tests
+  (:use
+   #:cl
+   #:alexandria
+   #:anaphora
+   #:clunit
+   #:let-plus
+   #:select
+   #:data-frame
+   #:json-to-df)
+  (:import-from #:nu #:as-alist #:as-plist)
+  (:export #:run))
 
-(in-package :json-to-df/tests/main)
-
-
-(defun data-frame-columns (df)
-  ;; return list of column names
-  (mapcar #'column-name (data-frame-columns-list df)))
-
-(defun data-frame-rows (df)
-  ;; return list of rows
-  (data-frame-rows-list df))
-
-
-
-
-(defun validate-data-frame (df)
-  ;; Check if the data frame is non-nil and has the expected columns
-  (and df
-       (typep df 'data-frame)
-       (equalp (data-frame-columns df) '(:userId :id :title :body))
-       (> (data-frame-rows df) 0)))
+(in-package :json-to-df-tests)
 
 
+(defsuite json-to-df-suite ())
+
+;;simple
+(deftest test-json-placeholder (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-url "https://jsonplaceholder.typicode.com/posts" "posts"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
 
 
-;; Test 1: Simple JSON from API
-(deftest simple-json-from-api-test
-  (let ((json-data (call-api *url*)))
-    (let ((df (json-to-df:json-to-df json-data)))
-      (ok (validate-data-frame df)))))
+;;complex
+(deftest test-json-users (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-url "https://jsonplaceholder.typicode.com/users" "usersDF"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
 
-;; Test 2: Nested JSON from a different API
-(deftest nested-json-from-api-test
-  (let* ((nested-url "https://jsonplaceholder.typicode.com/comments")
-         (json-data (call-api nested-url)))
-    (let ((df (json-to-df:json-to-df json-data)))
-      (ok (validate-data-frame df)))))
 
-;; Test 3: JSON with arrays (e.g., handling multiple objects)
-(deftest json-with-arrays-from-api-test
-  (let* ((array-url "https://jsonplaceholder.typicode.com/albums")
-         (json-data (call-api array-url)))
-    (let ((df (json-to-df:json-to-df json-data)))
-      (ok (validate-data-frame df)))))
+;; with countries
+(deftest test-json-countries (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-url "https://restcountries.com/v3.1/all" "countriesDF"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
+
+
+
+;; with key
+(deftest test-json-planets (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-url "https://www.swapi.tech/api/planets/" "planetsDF" "results"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
+
+
+
+
+
+
+
+;; Ejecutar las pruebas
+(defun run (&optional interactive?)
+  (run-suite 'json-to-df-suite :use-debugger interactive?))
+
+

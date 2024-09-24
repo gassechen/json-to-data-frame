@@ -5,7 +5,9 @@
   :depends-on (:yason
                :dexador
                :str
-               :lisp-stat)
+               :lisp-stat
+               :data-frame
+               #+sbcl "sb-cltl2")
   :components ((:module "src"
                 :components
                 ((:file "main"))))
@@ -13,16 +15,17 @@
   :in-order-to ((test-op (test-op "json-to-df/tests"))))
 
 (defsystem "json-to-df/tests"
-  :author ""
-  :license ""
+  :author "gassechen@gmail.com"
+  :license "MIT"
   :depends-on ("json-to-df"
-               "rove")
-  :components ((:module "tests"
-                :components
-                ((:file "main"))))
+               "clunit2")
+  :serial t
+  :pathname "tests/"
+  :components ((:file "main"))
   :description "Test system for json-to-df"
-  :perform (test-op (op c) (symbol-call :rove :run c)))
-
-
-
-
+  :perform (test-op (o s)
+                    (let ((*print-pretty* t)) ; work around clunit issue #9
+                      (symbol-call :clunit :run-suite
+                                   (find-symbol* :json-to-df-suite
+                                                 :json-to-df-tests)
+                                   :use-debugger nil))))
