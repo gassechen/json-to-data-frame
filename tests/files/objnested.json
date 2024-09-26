@@ -1,0 +1,29 @@
+[
+  {
+    "nombre": "Juan",
+    "edad": 30,
+    "ciudad": "Madrid",
+    "detalles": {
+      "profesion": "Ingeniero",
+      "experiencia": 5
+    }
+  },
+  {
+    "nombre": "Ana",
+    "edad": 25,
+    "ciudad": "Barcelona",
+    "detalles": {
+      "profesion": "Diseñadora",
+      "experiencia": 3
+    }
+  },
+  {
+    "nombre": "Luis",
+    "edad": 35,
+    "ciudad": "Valencia",
+    "detalles": {
+      "profesion": "Médico",
+      "experiencia": 10
+    }
+  }
+]

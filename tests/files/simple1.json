@@ -1,0 +1,17 @@
+{
+  "objeto1": {
+    "nombre": "Juan",
+    "edad": 30,
+    "ciudad": "Madrid"
+  },
+  "objeto2": {
+    "nombre": "Ana",
+    "edad": 25,
+    "ciudad": "Barcelona"
+  },
+  "objeto3": {
+    "nombre": "Luis",
+    "edad": 35,
+    "ciudad": "Valencia"
+  }
+}

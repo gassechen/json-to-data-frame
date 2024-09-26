@@ -2,6 +2,7 @@
   (:use :cl)
   (:export #:json-to-df
 	   #:get-from-url
+	   #:get-from-file
 	   #:dump-db))
 
 (in-package :json-to-df)
@@ -171,10 +172,9 @@
               (every #'characterp data))  
          (make-data-structure-correct (parse-json-string data)))
         ((hash-table-p data)  
-         (h-table data))
+            (h-table data))
         (t  
          data)))
-
 
 
   (defun make-data-structure-correct(data)
@@ -188,10 +188,21 @@
   (yason:parse (make-string-input-stream json-string)))
 
 
+
 (defun h-table (data)
-  (when (> (hash-table-count data) 1)
-    (let ((entries (extract-entries data)))
-      (car (evaluate-entries entries)))))
+  (let* ((entries (extract-entries data))
+         (processed-data (make-data-structure-correct (mapcar #'cdr entries))))
+    (if (> (hash-table-count data) 1)
+        processed-data
+        (gethash "data" processed-data))))
+
+
+
+;; (defun h-table (data)
+;;   (when (> (hash-table-count data) 1)
+;;     (let ((entries (extract-entries data)))
+;;       (mapcar #'cdr entries))))
+      
 
   
 
@@ -233,16 +244,6 @@
     entries))
 
 
-(defun evaluate-entries (entries)
-  (let ((response '()))
-    (dolist (entry entries)
-      (let ((key (car entry))
-            (value (cdr entry)))
-        (when (listp value)
-          (push value response))))
-    response))
-
-
 
 (defun remove-accents (str)
   (let* ((trans (make-hash-table :test 'equal))
@@ -278,7 +279,20 @@
 
 
 
+(defun read-json-file (file-path)
+  "Lee un archivo JSON y lo parsea."
+  (let* ((yason:*parse-json-booleans-as-symbols* t)
+         (yason:*parse-json-arrays-as-vectors* nil)
+         (json-content (uiop:read-file-string file-path)))
+    (yason:parse json-content)))
 
+(defun get-from-file (file-path &optional (df-name "DF") (key nil))
+  "Obtiene los datos desde un archivo JSON y, si `key` no es nil, busca el valor asociado con esa clave.
+   Si `key` es nil, pasa directamente la respuesta JSON completa a `json-to-df`."
+  (let ((response (read-json-file file-path)))
+    (if key
+        (json-to-df (gethash key response) df-name)
+        (json-to-df response df-name))))
 
 
 

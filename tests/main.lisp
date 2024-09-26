@@ -62,6 +62,76 @@
 
 
 
+;;;;;;;from files
+
+;;simple-array-obj
+(deftest test-json-simplefile (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-file "../tests/files/simpleobj.json" "filesimple"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
+
+
+;;array-obj-nested
+(deftest test-json-nestedfile (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-file "../tests/files/objnested.json" "objnested"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
+
+
+;;array-obj-nested-array-data
+(deftest test-json-nestedfileandarray (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-file "../tests/files/objnestedarraydata.json" "objnestedarraydata"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
+
+
+
+;;array-obj-multiple-key
+(deftest test-json-multiplekey (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-file "../tests/files/multiplekesy.json" "multiplekey"  "empleados"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
+
+
+
+;;simpleobj
+(deftest test-json-simpleobj (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-file "../tests/files/simple1.json" "objsimple"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
+
+
+
+;;complexobj
+(deftest test-json-complexobj (json-to-df-suite)
+  ;; Llamar a la API y obtener los datos en formato JSON
+  (let* ((json-data (get-from-file "../tests/files/complexobj1.json" "complexobj"))
+         ;; Convertir los datos JSON a un dataframe
+         )
+    
+    ;; Verificar que el dataframe fue creado correctamente
+    (assert (typep json-data 'data-frame))))
+
 
 
 

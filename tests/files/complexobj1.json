@@ -1,0 +1,58 @@
+{
+  "empresa": {
+    "nombre": "TechCorp",
+    "ubicacion": "Ciudad Futura",
+    "departamentos": {
+      "ventas": {
+        "gerente": "Juan Pérez",
+        "empleados": [
+          {
+            "nombre": "Ana",
+            "edad": 25,
+            "ciudad": "Barcelona",
+            "detalles": {
+              "profesion": "Vendedora",
+              "experiencia": 3,
+              "habilidades": ["Negociación", "Ventas", "Comunicación"]
+            }
+          },
+          {
+            "nombre": "Luis",
+            "edad": 30,
+            "ciudad": "Madrid",
+            "detalles": {
+              "profesion": "Vendedor",
+              "experiencia": 5,
+              "habilidades": ["Ventas", "Marketing", "Relaciones"]
+            }
+          }
+        ]
+      },
+      "tecnologia": {
+        "gerente": "María Gómez",
+        "empleados": [
+          {
+            "nombre": "Carlos",
+            "edad": 35,
+            "ciudad": "Valencia",
+            "detalles": {
+              "profesion": "Ingeniero",
+              "experiencia": 10,
+              "habilidades": ["Programación", "Diseño", "Análisis"]
+            }
+          },
+          {
+            "nombre": "Elena",
+            "edad": 28,
+            "ciudad": "Sevilla",
+            "detalles": {
+              "profesion": "Diseñadora",
+              "experiencia": 7,
+              "habilidades": ["Diseño gráfico", "UX/UI", "Ilustración"]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

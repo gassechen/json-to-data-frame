@@ -1,0 +1,58 @@
+{
+  "empleados": [
+    {
+      "nombre": "Juan",
+      "edad": 30,
+      "ciudad": "Madrid",
+      "detalles": {
+        "profesion": "Ingeniero",
+        "experiencia": 5,
+        "habilidades": ["Programación", "Diseño", "Análisis"]
+      }
+    },
+    {
+      "nombre": "Ana",
+      "edad": 25,
+      "ciudad": "Barcelona",
+      "detalles": {
+        "profesion": "Diseñadora",
+        "experiencia": 3,
+        "habilidades": ["Diseño gráfico", "Ilustración", "UX/UI"]
+      }
+    }
+  ],
+  "clientes": [
+    {
+      "nombre": "Luis",
+      "edad": 35,
+      "ciudad": "Valencia",
+      "detalles": {
+        "profesion": "Médico",
+        "experiencia": 10,
+        "habilidades": ["Medicina general", "Cirugía", "Pediatría"]
+      }
+    },
+    {
+      "nombre": "María",
+      "edad": 28,
+      "ciudad": "Sevilla",
+      "detalles": {
+        "profesion": "Abogada",
+        "experiencia": 7,
+        "habilidades": ["Derecho civil", "Derecho laboral", "Derecho penal"]
+      }
+    }
+  ],
+  "proveedores": [
+    {
+      "nombre": "Carlos",
+      "edad": 40,
+      "ciudad": "Bilbao",
+      "detalles": {
+        "profesion": "Comerciante",
+        "experiencia": 15,
+        "habilidades": ["Negociación", "Logística", "Comercialización"]
+      }
+    }
+  ]
+}

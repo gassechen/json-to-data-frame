@@ -1,0 +1,32 @@
+[
+  {
+    "nombre": "Juan",
+    "edad": 30,
+    "ciudad": "Madrid",
+    "detalles": {
+      "profesion": "Ingeniero",
+      "experiencia": 5,
+      "habilidades": ["Programación", "Diseño", "Análisis"]
+    }
+  },
+  {
+    "nombre": "Ana",
+    "edad": 25,
+    "ciudad": "Barcelona",
+    "detalles": {
+      "profesion": "Diseñadora",
+      "experiencia": 3,
+      "habilidades": ["Diseño gráfico", "Ilustración", "UX/UI"]
+    }
+  },
+  {
+    "nombre": "Luis",
+    "edad": 35,
+    "ciudad": "Valencia",
+    "detalles": {
+      "profesion": "Médico",
+      "experiencia": 10,
+      "habilidades": ["Medicina general", "Cirugía", "Pediatría"]
+    }
+  }
+]
