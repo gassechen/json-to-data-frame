@@ -92,6 +92,74 @@ JSON-TO-DF> (df:print-data my-df)
 ;; Output will display the data frame contents here
 ```
 
+# New function 
+```lisp
+
+(defun get-from-url (url-get &optional (df-name "DF") (key nil))
+
+;;with name df
+JSON-TO-DF> (get-from-url "https://jsonplaceholder.typicode.com/users" "usersDF")
+#<DATA-FRAME:DATA-FRAME (9 observations of 15 variables)>
+
+;;with key
+
+JSON-TO-DF> (get-from-url "https://www.swapi.tech/api/planets/" "planetsDF" "results")
+#<DATA-FRAME:DATA-FRAME (9 observations of 3 variables)>
+
+```
+# New function 
+```lisp
+
+(defun get-from-file (file-path &optional (df-name "DF") (key nil))
+
+JSON-TO-DF> (get-from-file "../tests/files/simpleobj.json" "filesimple")
+#<DATA-FRAME:DATA-FRAME (2 observations of 3 variables)>
+
+JSON-TO-DF> (get-from-file "../tests/files/multiplekesy.json" "multiplekey"  "empleados")
+#<DATA-FRAME:DATA-FRAME (1 observations of 8 variables)>
+
+
+```
+# TEST
+JSON-TO-DF> (asdf:test-system 'json-to-df)
+
+PROGRESS:
+=========
+
+    JSON-TO-DF-SUITE: (Test Suite)
+        TEST-JSON-COMPLEXOBJ: E
+        TEST-JSON-SIMPLEOBJ: 
+        TEST-JSON-MULTIPLEKEY: 
+        TEST-JSON-NESTEDFILEANDARRAY: 
+        TEST-JSON-NESTEDFILE: 
+        TEST-JSON-SIMPLEFILE: 
+        TEST-JSON-PLANETS: 
+        TEST-JSON-COUNTRIES: 
+        TEST-JSON-USERS: 
+        TEST-JSON-PLACEHOLDER: 
+
+FAILURE DETAILS:
+================
+
+    JSON-TO-DF-SUITE: (Test Suite)
+        TEST-JSON-COMPLEXOBJ: The value
+  (#<HASH-TABLE :TEST EQUAL :COUNT 3 {1015B12FB3}>)
+is not of type
+  HASH-TABLE
+
+
+SUMMARY:
+========
+    Test functions:
+        Executed: 10
+        Skipped:  0
+
+    Tested 1 assertion.
+        Errors: 1/1 all tests had errors
+T
+
+
+
 ---
 
 This README provides a clear and concise guide on how to use the `json-to-df` package to convert JSON data into a data frame and display it.
