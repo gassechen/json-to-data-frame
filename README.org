@@ -288,5 +288,5 @@ JSON-TO-DF> (get-from-url "https://www.swapi.tech/api/planets")
 
 #+begin_example
 JSON-TO-DF> (df-print *)
-TIMESTAMP                    | APIVERSION | NEXT                                  | estos pelotudo
+TIMESTAMP                    | APIVERSION | NEXT                                  | 
 #+end_example
