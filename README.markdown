@@ -1,39 +1,40 @@
 
-#+TITLE: JSON to Data Frame
+This repository provides a Common Lisp library to convert JSON data into
+a data frame using the \`json-to-df\` package. The package leverages the
+\`yason\` library for JSON parsing and \`dfio\` for data frame
+operations.
 
-This repository provides a Common Lisp library to convert JSON data into a data frame using the `json-to-df` package. The package leverages the `yason` library for JSON parsing and `dfio` for data frame operations.
-
-* Installation
+# Installation
 
 Clone the repository into your Quicklisp local-projects directory:
 
-#+begin_src sh
+``` bash
 git clone https://github.com/gassechen/json-to-data-frame.git ~/quicklisp/local-projects
-#+end_src
+```
 
 Load the package in your REPL:
 
-#+begin_src lisp
+``` commonlisp
 (ql:quickload :json-to-df)
-#+end_src
+```
 
-Switch to the `json-to-df` package:
+Switch to the \`json-to-df\` package:
 
-#+begin_src lisp
+``` commonlisp
 (in-package :json-to-df)
-#+end_src
+```
 
-* Example Usage
+# Example Usage
 
-** Step 1: Define the URL for the JSON API
+## Step 1: Define the URL for the JSON API
 
-#+begin_src lisp
+``` commonlisp
 (defparameter *url* "https://jsonplaceholder.typicode.com/posts")
-#+end_src
+```
 
-** Step 2: Define a function to call the API and parse the JSON response
+## Step 2: Define a function to call the API and parse the JSON response
 
-#+begin_src lisp
+``` commonlisp
 (defun call-api (url-get)
   (let* ((yason:*parse-json-booleans-as-symbols* t)
          (yason:*parse-json-arrays-as-vectors* nil)
@@ -45,90 +46,92 @@ Switch to the `json-to-df` package:
                      :connect-timeout 60
                      :want-stream t))))
     respuesta))
-#+end_src
+```
 
-** Step 3: Convert the JSON response to a data frame
+## Step 3: Convert the JSON response to a data frame
 
-#+begin_src lisp
+``` commonlisp
 (json-to-df (call-api *url*))
-#+end_src
+```
 
-You will be prompted to select a symbol to be made accessible in the DFIO package:
+You will be prompted to select a symbol to be made accessible in the
+DFIO package:
 
-#+begin_example
+``` example
 Select a symbol to be made accessible in package DFIO:
   1. DATA-FRAME::BODY
   2. DFIO::BODY
 
 Enter an integer (between 1 and 2): 1
-#+end_example
+```
 
-** Step 4: Display the data frames
+## Step 4: Display the data frames
 
-#+begin_src lisp
+``` commonlisp
 (lisp-stat:show-data-frames)
-#+end_src
+```
 
-** Step 5: Assign the data frame to a variable and print it
+## Step 5: Assign the data frame to a variable and print it
 
-#+begin_src lisp
+``` commonlisp
 (json-to-df (call-api *url*) "my-df")
 (lisp-stat:show-data-frames)
-#+end_src
+```
 
-** Step 6: Print the data frame
+## Step 6: Print the data frame
 
-#+begin_src lisp
+``` commonlisp
 (df:print-data my-df)
-#+end_src
+```
 
-** Output
+## Output
 
-The `df:print-data` function will print the contents of the data frame `my-df`:
+The \`df:print-data\` function will print the contents of the data frame
+\`my-df\`:
 
-#+begin_example
+``` example
 JSON-TO-DF> (df:print-data my-df);; Output will display the data frame contents here
-#+end_example
+```
 
-* New Functions 🆕
+# New Functions 🆕
 
-** get-from-url
+## get-from-url
 
-#+begin_src lisp
+``` commonlisp
 (defun get-from-url (url-get &optional (df-name "DF") (key nil))
-#+end_src
+```
 
-#+begin_src lisp
+``` commonlisp
 ;; with a specified data frame name
 JSON-TO-DF> (get-from-url "https://jsonplaceholder.typicode.com/users" "usersDF")
 #<DATA-FRAME:DATA-FRAME (9 observations of 15 variables)>
-#+end_src
+```
 
-#+begin_src lisp
+``` commonlisp
 ;; with a specified key to flatten
 JSON-TO-DF> (get-from-url "https://www.swapi.tech/api/planets/" "planetsDF" "results")
 #<DATA-FRAME:DATA-FRAME (9 observations of 3 variables)>
-#+end_src
+```
 
-** get-from-file
+## get-from-file
 
-#+begin_src lisp
+``` commonlisp
 (defun get-from-file (file-path &optional (df-name "DF") (key nil))
-#+end_src
+```
 
-#+begin_src lisp
+``` commonlisp
 JSON-TO-DF> (get-from-file "../tests/files/simpleobj.json" "filesimple")
 #<DATA-FRAME:DATA-FRAME (2 observations of 3 variables)>
-#+end_src
+```
 
-#+begin_src lisp
+``` commonlisp
 JSON-TO-DF> (get-from-file "../tests/files/multiplekesy.json" "multiplekey" "empleados")
 #<DATA-FRAME:DATA-FRAME (1 observations of 8 variables)>
-#+end_src
+```
 
-* Test Results
+# Test Results
 
-#+begin_example
+``` example
 JSON-TO-DF> (asdf:test-system 'json-to-df)
 
 PROGRESS:
@@ -164,40 +167,43 @@ SUMMARY:
     Tested 1 assertion.
         Errors: 1/1 all tests had errors
 T
-#+end_example
+```
 
-* JSON API Test Cases
+# JSON API Test Cases
 
-** 1. Root Object
+## 1. Root Object
 
-This API returns a single object with product information. It's ideal for testing that your code can handle the conversion of a single record.
+This API returns a single object with product information. It's ideal
+for testing that your code can handle the conversion of a single record.
 
-URL: `https://fakestoreapi.com/products/1`
+URL: \`https://fakestoreapi.com/products/1\`
 
-#+begin_src lisp
+``` commonlisp
 JSON-TO-DF> (get-from-url "https://fakestoreapi.com/products/1")
 #<DATA-FRAME (1 observations of 8 variables)>
-#+end_src
+```
 
-#+begin_example
+``` example
 JSON-TO-DF> (df-print *)
 IMAGE                                                 | CATEGORY       | DESCRIPTION                                                                                              | PRICE      | TITLE                                              | ID | RATING_COUNT | RATING_RATE
 https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png | men's clothing | Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday | 109.95d0 | Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops | 1  | 120          | 3.9d0
 ; No value
-#+end_example
+```
 
-** 2. Array of Objects (Common Case)
+## 2. Array of Objects (Common Case)
 
-This is the most common response type. It returns a list of post objects, similar to those you have already tested. It's perfect for validating that your code processes an array of records.
+This is the most common response type. It returns a list of post
+objects, similar to those you have already tested. It's perfect for
+validating that your code processes an array of records.
 
-URL: `https://jsonplaceholder.typicode.com/posts`
+URL: \`https://jsonplaceholder.typicode.com/posts\`
 
-#+begin_src lisp
+``` commonlisp
 (get-from-url "https://jsonplaceholder.typicode.com/posts")
 #<DATA-FRAME (100 observations of 4 variables)>
-#+end_src
+```
 
-#+begin_example
+``` example
 JSON-TO-DF> (df-print *)
 BODY                                                                                                                                                                                                                          | TITLE                                                                      | ID  | USERID
 quia et suscipit
@@ -220,38 +226,43 @@ repudiandae veniam quaerat sunt sed
 alias aut fugiat sit autem sed est
 voluptatem omnis possimus esse voluptatibus quis
 est aut tenetur dolor neque
-#+end_example
+```
 
-** 3. Object with Nested Properties
+## 3. Object with Nested Properties
 
-This URL provides user information where the address property is a nested object. This is a crucial test case to confirm that your flattening logic works correctly.
+This URL provides user information where the address property is a
+nested object. This is a crucial test case to confirm that your
+flattening logic works correctly.
 
-URL: `https://jsonplaceholder.typicode.com/users/1`
+URL: \`https://jsonplaceholder.typicode.com/users/1\`
 
-#+begin_src lisp
+``` commonlisp
 (get-from-url "https://jsonplaceholder.typicode.com/users/1")
 #<DATA-FRAME (1 observations of 15 variables)>
-#+end_src
+```
 
-#+begin_example
+``` example
 JSON-TO-DF> (df-print *)
 WEBSITE       | PHONE                  | EMAIL             | USERNAME | NAME          | ID | ADDRESS_ZIPCODE | ADDRESS_CITY | ADDRESS_SUITE | ADDRESS_STREET | ADDRESS_GEO_LNG | ADDRESS_GEO_LAT | COMPANY_BS                | COMPANY_CATCHPHRASE            | COMPANY_NAME
 hildegard.org | 1-770-736-8031 x56442 | Sincere@april.biz | Bret     | Leanne Graham | 1  | 92998-3874      | Gwenborough  | Apt. 556      | Kulas Light    | 81.1496         | -37.3159        | harness real-time e-markets | Multi-layered client-server neural-net | Romaguera-Crona
 ; No value
-#+end_example
+```
 
-** 4. Array of Objects with Nested Structure
+## 4. Array of Objects with Nested Structure
 
-This is the most complex type of JSON. The API returns a list of GitHub repositories, and each repository has nested objects (like owner) and arrays (like topics). This is an excellent test case for your recursive function.
+This is the most complex type of JSON. The API returns a list of GitHub
+repositories, and each repository has nested objects (like owner) and
+arrays (like topics). This is an excellent test case for your recursive
+function.
 
-URL: `https://api.github.com/users/google/repos`
+URL: \`https://api.github.com/users/google/repos\`
 
-#+begin_src lisp
+``` commonlisp
 JSON-TO-DF> (get-from-url "https://api.github.com/users/google/repos")
 #<DATA-FRAME (30 observations of 105 variables)>
-#+end_src
+```
 
-#+begin_example
+``` example
 JSON-TO-DF> (df-print *)
 TOPICS_5 | TOPICS_4 | TOPICS_3   | TOPICS_2      | DEFAULTBRANCH | WATCHERS | OPENISSUES | FORKS | VISIBILITY | WEBCOMMITSIGNOFFREQUIRED | ISTEMPLATE | ALLOWFORKING | OPENISSUESCOUNT | DISABLED | ARCHIVED | FORKSCOUNT | HASDISCUSSIONS | HASPAGES | HASWIKI | HASDOWNLOADS | HASPROJECTS | HASISSUES | LANGUAGE   | WATCHERSCOUNT | STARGAZERSCOUNT | SIZE  | HOMEPAGE                                 | SVNURL                                                               | CLONEURL                                                                  | SSHURL                                                               | GITURL                                                                    | PUSHEDAT             | UPDATEDAT            | CREATEDAT            | DEPLOYMENTSURL                                                                                               | RELEASESURL                                                                                                | LABELSURL                                                                                                  | NOTIFICATIONSURL                                                                                                                                                                                            | MILESTONESURL                                                                                                                               | PULLSURL                                                                                                                               | ISSUESURL                                                                                                                               | DOWNLOADSURL                                                                                             | ARCHIVEURL                                                                                                       | MERGESURL                                                                                             | COMPAREURL                                                                                                               | CONTENTSURL                                                                                                       | ISSUECOMMENTURL                                                                                                                     | COMMENTSURL                                                                                                          | GITCOMMITSURL                                                                                                         | COMMITSURL                                                                                                        | SUBSCRIPTIONURL                                                                                             | SUBSCRIBERSURL                                                                                              | CONTRIBUTORSURL                                                                                              | STARGAZERSURL                                                                                              | LANGUAGESURL                                                                                              | STATUSESURL                                                                                                 | TREESURL                                                                                                         | GITREFSURL                                                                                                       | GITTAGSURL                                                                                                       | BLOBSURL                                                                                                          | TAGSURL                                                                                             | BRANCHESURL                                                                                                          | ASSIGNEESURL                                                                                                       | EVENTSURL                                                                                             | ISSUEEVENTSURL                                                                                                             | HOOKSURL                                                                                             | TEAMSURL                                                                                             | COLLABORATORSURL                                                                                                                        | KEYSURL                                                                                                         | FORKSURL                                                                                              | URL                                                                                             | FORK | DESCRIPTION                                                                                                                                                         | HTMLURL                                                               | PRIVATE | FULLNAME                                   | NAME                  | NODEID                 | ID        | OWNER_SITEADMIN | OWNER_USERVIEWTYPE | OWNER_TYPE   | OWNER_RECEIVEDEVENTSURL                                | OWNER_EVENTSURL                                     | OWNER_REPOSURL                            | OWNER_ORGANIZATIONSURL           | OWNER_SUBSCRIPTIONSURL             | OWNER_STARREDURL                                        | OWNER_GISTSURL                       | OWNER_FOLLOWINGURL                         | OWNER_FOLLOWERSURL                         | OWNER_HTMLURL             | OWNER_URL                               | OWNER_GRAVATARID | OWNER_AVATARURL                                     | OWNER_NODEID             | OWNER_ID | OWNER_LOGIN | LICENSE_NODEID   | LICENSE_URL                                   | LICENSE_SPDXID | LICENSE_NAME       | LICENSE_KEY | TOPICS_1            | TOPICS_0
 NA   | NA   | NA         | NA            | main          | 8        | 0          | 2     | public     | 0                        | 0          | 1            | 0               | 0        | 1        | 2          | 0              | 0        | 1       | 1            | 1           | 1         | NA         | 8             | 8               | 12    | NA                                       | https://github.com/google/.allstar                                   | https://github.com/google/.allstar.git                                    | git@github.com:google/.allstar.git                                   | git://github.com/google/.allstar.git                                      | 2023-04-13T18:39:09Z | 2025-02-18T21:27:33Z | 2022-02-17T20:40:32Z | https://api.github.com/repos/google/.allstar/deployments                         | https://api.github.com/repos/google/.allstar/releases{/id}                         | https://api.github.com/repos/google/.allstar/labels{/name}                         | https://api.github.com/repos/google/.allstar/notifications{?since,all,participating}                                          | https://api.github.com/repos/google/.allstar/milestones{/number}                         | https://api.github.com/repos/google/.allstar/pulls{/number}                         | https://api.github.com/repos/google/.allstar/issues{/number}                         | https://api.github.com/repos/google/.allstar/downloads                         | https://api.github.com/repos/google/.allstar/{archive_format}{/ref}                        | https://api.github.com/repos/google/.allstar/merges                         | https://api.github.com/repos/google/.allstar/compare/{base}...{head}                         | https://api.github.com/repos/google/.allstar/contents/{+path}                         | https://api.github.com/repos/google/.allstar/issues/comments{/number}                         | https://api.github.com/repos/google/.allstar/comments{/number}                         | https://api.github.com/repos/google/.allstar/git/commits{/sha}                         | https://api.github.com/repos/google/.allstar/commits{/sha}                         | https://api.github.com/repos/google/.allstar/subscription                         | https://api.github.com/repos/google/.allstar/subscribers                         | https://api.github.com/repos/google/.allstar/contributors                         | https://api.github.com/repos/google/.allstar/stargazers                         | https://api.github.com/repos/google/.allstar/languages                         | https://api.github.com/repos/google/.allstar/statuses/{sha}                         | https://api.github.com/repos/google/.allstar/git/trees{/sha}                         | https://api.github.com/repos/google/.allstar/git/refs{/sha}                         | https://api.github.com/repos/google/.allstar/git/tags{/sha}                         | https://api.github.com/repos/google/.allstar/git/blobs{/sha}                         | https://api.github.com/repos/google/.allstar/tags                         | https://api.github.com/repos/google/.allstar/branches{/branch}                         | https://api.github.com/repos/google/.allstar/assignees{/user}                         | https://api.github.com/repos/google/.allstar/events                         | https://api.github.com/repos/google/.allstar/issues/events{/number}                         | https://api.github.com/repos/google/.allstar/hooks                         | https://api.github.com/repos/google/.allstar/teams                         | https://api.github.com/repos/google/.allstar/collaborators{/collaborator}                         | https://api.github.com/repos/google/.allstar/keys{/key_id}                         | https://api.github.com/repos/google/.allstar/forks                         | https://api.github.com/repos/google/.allstar                         | 0    | NA                                                                                                                                    | https://github.com/google/.allstar                          | 0       | google/.allstar                            | .allstar              | R_kgDOG3Q2HA           | 460600860 | 0               | public             | Organization | https://api.github.com/users/google/received_events | https://api.github.com/users/google/events{/privacy} | https://api.github.com/users/google/repos | https://api.github.com/users/google/orgs | https://api.github.com/users/google/subscriptions | https://api.github.com/users/google/starred{/owner}{/repo} | https://api.github.com/users/google/gists{/gist_id} | https://api.github.com/users/google/following{/other_user} | https://api.github.com/users/google/followers | https://github.com/google | https://api.github.com/users/google |                 | https://avatars.githubusercontent.com/u/1342004?v=4 | MDEyOk9yZ2FuaXphdGlvbjEzNDIwMDQ= | 1342004  | google      | MDc6TGljZW5zZTI= | https://api.github.com/licenses/apache-2.0 | Apache-2.0     | Apache License 2.0 | apache-2.0  | NA                  | NA
@@ -272,21 +283,23 @@ JSON-TO-DF> (get-from-url "https://api.first.org/data/v1/countries" "PAISES")
 JSON-TO-DF> (df-print *)
 LIMIT | OFFSET | TOTAL | ACCESS | VERSION | STATUSCODE | STATUS | DATA_DZ_REGION | DATA_DZ_COUNTRY | DATA_AO_REGION | DATA_AO_COUNTRY | DATA_BJ_REGION | DATA_BJ_COUNTRY | DATA_BW_REGION | DATA_BW_COUNTRY | DATA_BF_REGION | DATA_BF_COUNTRY | DATA_BI_REGION | DATA_BI_COUNTRY | DATA_CV_REGION | DATA_CV_COUNTRY | DATA_CM_REGION | DATA_CM_COUNTRY | DATA_CF_REGION | DATA_CF_COUNTRY                        | DATA_TD_REGION | DATA_TD_COUNTRY | DATA_KM_REGION | DATA_KM_COUNTRY | DATA_CD_REGION | DATA_CD_COUNTRY                        | DATA_CG_REGION | DATA_CG_COUNTRY | DATA_CI_REGION | DATA_CI_COUNTRY | DATA_DJ_REGION | DATA_DJ_COUNTRY | DATA_EG_REGION | DATA_EG_COUNTRY | DATA_GQ_REGION | DATA_GQ_COUNTRY   | DATA_ER_REGION | DATA_ER_COUNTRY | DATA_SZ_REGION | DATA_SZ_COUNTRY | DATA_ET_REGION | DATA_ET_COUNTRY | DATA_GA_REGION | DATA_GA_COUNTRY | DATA_GM_REGION | DATA_GM_COUNTRY | DATA_GH_REGION | DATA_GH_COUNTRY | DATA_GN_REGION | DATA_GN_COUNTRY | DATA_GW_REGION | DATA_GW_COUNTRY | DATA_KE_REGION | DATA_KE_COUNTRY | DATA_LS_REGION | DATA_LS_COUNTRY | DATA_LR_REGION | DATA_LR_COUNTRY | DATA_LY_REGION | DATA_LY_COUNTRY | DATA_MG_REGION | DATA_MG_COUNTRY | DATA_MW_REGION | DATA_MW_COUNTRY | DATA_ML_REGION | DATA_ML_COUNTRY | DATA_MR_REGION | DATA_MR_COUNTRY | DATA_MU_REGION | DATA_MU_COUNTRY | DATA_YT_REGION | DATA_YT_COUNTRY | DATA_MA_REGION | DATA_MA_COUNTRY | DATA_MZ_REGION | DATA_MZ_COUNTRY | DATA_NA_REGION | DATA_NA_COUNTRY | DATA_NE_REGION | DATA_NE_COUNTRY | DATA_NG_REGION | DATA_NG_COUNTRY | DATA_RE_REGION | DATA_RE_COUNTRY | DATA_RW_REGION | DATA_RW_COUNTRY | DATA_SH_REGION | DATA_SH_COUNTRY                                 | DATA_ST_REGION | DATA_ST_COUNTRY       | DATA_SN_REGION | DATA_SN_COUNTRY | DATA_SC_REGION | DATA_SC_COUNTRY | DATA_SL_REGION | DATA_SL_COUNTRY | DATA_SO_REGION | DATA_SO_COUNTRY | DATA_ZA_REGION | DATA_ZA_COUNTRY | DATA_SS_REGION | DATA_SS_COUNTRY | DATA_SD_REGION | DATA_SD_COUNTRY | DATA_TZ_REGION | DATA_TZ_COUNTRY                 | DATA_TG_REGION | DATA_TG_COUNTRY | DATA_TN_REGION | DATA_TN_COUNTRY | DATA_UG_REGION | DATA_UG_COUNTRY | DATA_EH_REGION | DATA_EH_COUNTRY | DATA_ZM_REGION | DATA_ZM_COUNTRY | DATA_ZW_REGION | DATA_ZW_COUNTRY | DATA_AQ_REGION | DATA_AQ_COUNTRY | DATA_BV_REGION | DATA_BV_COUNTRY | DATA_TF_REGION | DATA_TF_COUNTRY                   | DATA_HM_REGION | DATA_HM_COUNTRY                   | DATA_GS_REGION | DATA_GS_COUNTRY                             | DATA_AF_REGION | DATA_AF_COUNTRY | DATA_AM_REGION | DATA_AM_COUNTRY | DATA_AZ_REGION | DATA_AZ_COUNTRY | DATA_BD_REGION | DATA_BD_COUNTRY | DATA_BT_REGION | DATA_BT_COUNTRY | DATA_IO_REGION | DATA_IO_COUNTRY                   | DATA_BN_REGION | DATA_BN_COUNTRY   | DATA_KH_REGION | DATA_KH_COUNTRY | DATA_CN_REGION | DATA_CN_COUNTRY | DATA_GE_REGION | DATA_GE_COUNTRY | DATA_HK_REGION | DATA_HK_COUNTRY | DATA_IN_REGION | DATA_IN_COUNTRY | DATA_ID_REGION | DATA_ID_COUNTRY | DATA_JP_REGION | DATA_JP_COUNTRY | DATA_KZ_REGION | DATA_KZ_COUNTRY | DATA_KP_REGION | DATA_KP_COUNTRY                 | DATA_KR_REGION | DATA_KR_COUNTRY         | DATA_KG_REGION | DATA_KG_COUNTRY | DATA_LA_REGION | DATA_LA_COUNTRY                 | DATA_MO_REGION | DATA_MO_COUNTRY | DATA_MY_REGION | DATA_MY_COUNTRY | DATA_MV_REGION | DATA_MV_COUNTRY | DATA_MN_REGION | DATA_MN_COUNTRY | DATA_MM_REGION | DATA_MM_COUNTRY | DATA_NP_REGION | DATA_NP_COUNTRY | DATA_PK_REGION | DATA_PK_COUNTRY | DATA_PH_REGION | DATA_PH_COUNTRY   | DATA_SG_REGION | DATA_SG_COUNTRY | DATA_LK_REGION | DATA_LK_COUNTRY | DATA_TW_REGION | DATA_TW_COUNTRY         | DATA_TJ_REGION | DATA_TJ_COUNTRY | DATA_TH_REGION | DATA_TH_COUNTRY | DATA_TL_REGION | DATA_TL_COUNTRY | DATA_TM_REGION | DATA_TM_COUNTRY | DATA_UZ_REGION | DATA_UZ_COUNTRY | DATA_VN_REGION | DATA_VN_COUNTRY | DATA_BZ_REGION  | DATA_BZ_COUNTRY
 100   | 0      | 249   | public | 1.0     | 200        | OK     | Africa         | Algeria         | Africa         | Angola          | Africa         | Benin           | Africa         | Botswana        | Africa         | Burkina Faso    | Africa         | Burundi         | Africa         | Cabo Verde      | Africa         | Cameroon        | Africa         | Central African Republic (the) | Africa         | Chad            | Africa         | Comoros (the)   | Africa         | Congo (the Democratic Republic of the) | Africa         | Congo (the)     | Africa         | Côte d'Ivoire   | Africa         | Djibouti        | Africa         | Egypt           | Africa         | Equatorial Guinea | Africa         | Eritrea         | Africa         | Eswatini        | Africa         | Ethiopia        | Africa         | Gabon           | Africa         | Gambia (the)    | Africa         | Ghana           | Africa         | Guinea          | Africa         | Guinea-Bissau   | Africa         | Kenya           | Africa         | Lesotho         | Africa         | Liberia         | Africa         | Libya           | Africa         | Madagascar      | Africa         | Malawi          | Africa         | Mali            | Africa         | Mauritania      | Africa         | Mauritius       | Africa         | Mayotte         | Africa         | Morocco         | Africa         | Mozambique      | Africa         | Namibia         | Africa         | Niger (the)     | Africa         | Nigeria         | Africa         | Réunion         | Africa         | Rwanda          | Africa         | Saint Helena, Ascension and Tristan da Cunha | Africa         | Sao Tome and Principe | Africa         | Senegal         | Africa         | Seychelles      | Africa         | Sierra Leone    | Africa         | Somalia         | Africa         | South Africa    | Africa         | South Sudan     | Africa         | Sudan (the)     | Africa         | Tanzania, the United Republic of | Africa         | Togo            | Africa         | Tunisia         | Africa         | Uganda          | Africa         | Western Sahara* | Africa         | Zambia          | Africa         | Zimbabwe        | Antarctic      | Antarctica      | Antarctic      | Bouvet Island   | Antarctic      | French Southern Territories (the) | Antarctic      | Heard Island and McDonald Islands | Antarctic      | South Georgia and the South Sandwich Islands | Asia           | Afghanistan     | Asia           | Armenia         | Asia           | Azerbaijan      | Asia           | Bangladesh      | Asia           | Bhutan          | Asia           | British Indian Ocean Territory (the) | Asia           | Brunei Darussalam | Asia           | Cambodia        | Asia           | China           | Asia           | Georgia         | Asia           | Hong Kong       | Asia           | India           | Asia           | Indonesia       | Asia           | Japan           | Asia           | Kazakhstan      | Asia           | Korea (the Democratic People's Republic of) | Asia           | Korea (the Republic of) | Asia           | Kyrgyzstan      | Asia           | Lao People's Democratic Republic (the) | Asia           | Macao           | Asia           | Malaysia        | Asia           | Maldives        | Asia           | Mongolia        | Asia           | Myanmar         | Asia           | Nepal           | Asia           | Pakistan        | Asia           | Philippines (the) | Asia           | Singapore       | Asia           | Sri Lanka       | Asia           | Taiwan (Province of China) | Asia           | Tajikistan      | Asia           | Thailand        | Asia           | Timor-Leste     | Asia           | Turkmenistan    | Asia           | Uzbekistan      | Asia           | Viet Nam        | Central America | Belize
-#+end_example
+```
 
-** 6. Mixed JSON (Object with a Main Key)
+## 6. Mixed JSON (Object with a Main Key)
 
-This Star Wars API returns an object with several keys, where the list of planets you need to flatten is under the "results" key. This validates that your `get-from-url` function can access the correct subset of data.
+This Star Wars API returns an object with several keys, where the list
+of planets you need to flatten is under the "results" key. This
+validates that your \`get-from-url\` function can access the correct
+subset of data.
 
-URL: `https://www.swapi.tech/api/planets`
+URL: \`https://www.swapi.tech/api/planets\`
 
-#+begin_src lisp
+``` commonlisp
 JSON-TO-DF> (get-from-url "https://www.swapi.tech/api/planets")
 #<DATA-FRAME (1 observations of 45 variables)>
-#+end_src
+```
 
-#+begin_example
+``` example
 JSON-TO-DF> (df-print *)
-TIMESTAMP                    | APIVERSION | NEXT                                  | estos pelotudo
-#+end_example
-
+TIMESTAMP                    | APIVERSION | NEXT                                  | 
+```
