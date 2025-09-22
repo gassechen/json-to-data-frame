@@ -7,7 +7,7 @@
 
 (in-package :json-to-df)
 
-;; Variables globales para el estado del programa
+;; Variables globales
 (defvar *db* nil)
 (defvar *data* nil)
 
@@ -21,7 +21,7 @@
   (format t "~{~{~a:~10t~a~%~}~%~}" db))
 
 (defun boolean-to-sqlite (value)
-  (cond ((equal value'YASON:TRUE ) 1)
+  (cond ((equal value 'YASON:TRUE) 1)
         ((equal value 'YASON:FALSE) 0)
         (t value)))
 
@@ -49,32 +49,20 @@
     keys))
 
 (defun select-column-values (key alist)
-  "Extrae los valores de una clave de una lista de alistas."
+  "Extrae los valores de una clave de una lista de plists."
   (mapcar (lambda (pair)
             (getf pair key))
           alist))
 
 (defun extract-keys-columns (data)
-  "Extrae las claves de las listas de propiedades (alists) para definir las columnas."
+  "Extrae las claves de las listas de propiedades (plists) para definir las columnas."
   (let ((flat-data (alexandria:flatten data)))
     (remove-duplicates (remove-if-not #'symbolp flat-data))))
 
-(defun reverse-df (df)
-  "Invierte el orden de las columnas de un data frame."
-  (lisp-stat:make-df (reverse (lisp-stat:keys df)) (reverse (lisp-stat:columns df))))
-
-(defun extract-entries (hash-table)
-  (let ((entries '()))
-    (maphash (lambda (key value)
-               (push (cons key value) entries))
-             hash-table)
-    entries))
-
-;; --- Funciones para el nuevo aplanamiento recursivo ---
-
+;; Funciones de aplanamiento corregidas (devuelven plists)
 (defun flatten-hash-table (hash-table &optional prefix)
-  "Recorre un hash-table de forma recursiva y lo aplana en una alist (lista de propiedades)."
-  (let ((alist '()))
+  "Recorre un hash-table de forma recursiva y lo aplana en una plist."
+  (let ((plist '()))
     (maphash (lambda (key val)
                (let* ((value (boolean-to-sqlite val))
                       (keyc (sanitize-column-names key))
@@ -82,53 +70,47 @@
                                     (concatenate 'string prefix "_" keyc)
                                     keyc)))
                  (cond ((typep value 'hash-table)
-                        ;; Si el valor es otro hash-table, lo aplana de forma recursiva
-                        (setf alist (append alist (flatten-hash-table value full-key))))
+                        (setf plist (append plist (flatten-hash-table value full-key))))
                        ((listp value)
-                        ;; Si es una lista, la procesa como un array de valores o de objetos
-                        (setf alist (append alist (flatten-list-of-values value full-key))))
+                        (setf plist (append plist (flatten-list-of-values value full-key))))
                        (t
-                        ;; Si es un valor simple, lo añade a la alist aplanada
-                        (push (cons (alexandria:make-keyword (string-upcase full-key))
-                                    value)
-                              alist)))))
+                        (push value plist)
+                        (push (alexandria:make-keyword (string-upcase full-key)) plist)))))
              hash-table)
-    alist))
+    plist))
 
 (defun flatten-list-of-values (list-of-values &optional prefix)
-  "Recorre una lista de valores y los aplana. Si son objetos, los aplana de forma recursiva."
-  (let ((alist '()))
+  "Recorre una lista de valores y los aplana en una plist."
+  (let ((plist '()))
     (loop for item in list-of-values
           for i from 0
           do (let* ((full-key (concatenate 'string prefix "_" (princ-to-string i))))
                (cond ((typep item 'hash-table)
-                      (setf alist (append alist (flatten-hash-table item full-key))))
+                      (setf plist (append plist (flatten-hash-table item full-key))))
                      ((listp item)
-                      (setf alist (append alist (flatten-list-of-values item full-key))))
+                      (setf plist (append plist (flatten-list-of-values item full-key))))
                      (t
-                      (push (cons (alexandria:make-keyword (string-upcase full-key))
-                                  item)
-                            alist)))))
-    alist))
+                      (push item plist)
+                      (push (alexandria:make-keyword (string-upcase full-key)) plist)))))
+    plist))
 
-
-;; --- Funciones principales ---
-
+;; Funciones principales (con un ajuste para valores simples en la raíz)
 (defun json-to-df (data &optional (df-name "DF"))
   "Convierte datos JSON en un data frame aplanado."
   (let ((yason:*parse-json-booleans-as-symbols* t)
         (yason:*parse-json-arrays-as-vectors* nil)
         (records-list '()))
     (setf *data* data)
-    ;; Asume que la mayoría de los JSONs son una lista de objetos en la raíz
     (if (listp *data*)
         (dolist (item *data*)
           (if (hash-table-p item)
               (push (flatten-hash-table item) records-list)
               ;; Maneja arrays de valores simples
-              (push (list (cons :data item)) records-list)))
-        ;; Si es un solo objeto o valor, lo convierte en una lista para procesarlo
-        (push (flatten-hash-table (if (hash-table-p *data*) *data* (list (cons "data" *data*))))
+              (push (list :data item) records-list)))
+        ;; Maneja objetos o valores simples en la raíz
+        (push (if (hash-table-p *data*)
+                  (flatten-hash-table *data*)
+                  (list :data *data*))
               records-list))
     (setf records-list (reverse records-list))
     (eval `(lisp-stat:defdf ,(intern (str:upcase df-name))
@@ -146,7 +128,6 @@
                                     (coerce column-values 'vector)))
                                 key-list))))
 
-
 (defun call-api (url-get)
   "Llama a una URL y parsea la respuesta JSON."
   (let* ((yason:*parse-json-booleans-as-symbols* t)
@@ -159,7 +140,6 @@
                     :connect-timeout 60
                     :want-stream t))))
     respuesta))
-
 
 (defun get-from-url (url-get &optional (df-name "DF") (key nil))
   "Obtiene los datos desde la URL y los convierte en un data frame."
@@ -181,9 +161,3 @@
     (if key
         (json-to-df (gethash key response) df-name)
         (json-to-df response df-name))))
-
-
-
-
-
-
